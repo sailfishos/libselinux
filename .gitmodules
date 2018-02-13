@@ -1,3 +1,6 @@
 [submodule "selinux"]
 	path = selinux
 	url = https://github.com/SELinuxProject/selinux
+[submodule "upstream"]
+	path = upstream
+	url = https://github.com/SELinuxProject/selinux/
