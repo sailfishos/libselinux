@@ -20,8 +20,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-%define libsepolver 2.7-3
-%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+%define libsepolver 2.7-1
+# our old rpm doesn't zet support the rundir macro
+%if ! %{defined _rundir}
+%define _rundir %{_localstatedir}/run
+%endif
+
+%define python3_sitearch /%{_libdir}/python3.?/site-packages
 
 Summary: SELinux library and simple utilities
 Name: libselinux
@@ -31,13 +36,13 @@ License: Public Domain
 Group: System Environment/Libraries
 # https://github.com/SELinuxProject/selinux/wiki/Releases
 Source: selinux-userland-%{version}/upstream
-Source1: selinuxconlist.8
-Source2: selinuxdefcon.8
+#Source1: selinuxconlist.8
+#Source2: selinuxdefcon.8
 Url: https://github.com/SELinuxProject/selinux/wiki
 Patch1: ln_old_coreutils.patch
-BuildRequires: libsepol-static >= %{libsepolver} swig pcre2-devel xz-devel python3 python3-devel
+BuildRequires: libsepol-static >= %{libsepolver} swig xz-devel python3-base python3-devel
 BuildRequires: systemd
-Requires: libsepol%{?_isa} >= %{libsepolver} pcre2
+Requires: libsepol%{?_isa} >= %{libsepolver}
 #Conflicts: filesystem < 3, selinux-policy-base < 3.13.1-138
 
 %description
@@ -101,9 +106,11 @@ needed for developing SELinux applications.
 %patch1
 
 %build
+# only build libsepol
+cd %{name}
 export LDFLAGS="%{?__global_ldflags}"
 export DISABLE_RPM="y"
-export USE_PCRE2="y"
+export USE_PCRE2="n"
 
 # To support building the Python wrapper against multiple Python runtimes
 # Define a function, for how to perform a "build" of the python wrapper against
@@ -145,6 +152,8 @@ InstallPythonWrapper() {
     install-pywrap
 }
 
+# only install libsepol
+cd %{name}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_tmpfilesdir}
 mkdir -p %{buildroot}%{_libdir}
@@ -175,14 +184,18 @@ rm -f %{buildroot}%{_sbindir}/selinux_check_securetty_context
 mv %{buildroot}%{_sbindir}/getdefaultcon %{buildroot}%{_sbindir}/selinuxdefcon
 mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
 install -d %{buildroot}%{_mandir}/man8/
-install -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
-install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man8/
+#install -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
+#install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man8/
 rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 
-%ldconfig_scriptlets
+#%ldconfig_scriptlets
+%post
+/sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
-%license LICENSE
+%doc %{name}/LICENSE
 %{_libdir}/libselinux.so.*
 %dir %{_rundir}/setrans/
 %{_sbindir}/sefcontext_compile
@@ -220,6 +233,11 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %{python3_sitearch}/_selinux.*.so
 
 %changelog
+* Mon Feb 19 2018 Oliver Schmidt <oliver.schmidt@jollamobile.com>
+- convert to tar_git package
+- adjustments for building package on Mer
+- reducing dependencies: don't build for python2, ruby and pcre2
+
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.7-11
 - Escape macros in %%changelog
 
