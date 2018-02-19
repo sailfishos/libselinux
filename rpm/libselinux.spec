@@ -20,11 +20,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-%if 0%{?fedora} > 12 || 0%{?rhel} >= 8
-%global with_python3 1
-%endif
-
-%define ruby_inc %(pkg-config --cflags ruby)
 %define libsepolver 2.7-3
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
@@ -35,22 +30,15 @@ Release: 11%{?dist}
 License: Public Domain
 Group: System Environment/Libraries
 # https://github.com/SELinuxProject/selinux/wiki/Releases
-Source: https://raw.githubusercontent.com/wiki/SELinuxProject/selinux/files/releases/20170804/libselinux-2.7.tar.gz
+Source: selinux-userland-%{version}/upstream
 Source1: selinuxconlist.8
 Source2: selinuxdefcon.8
 Url: https://github.com/SELinuxProject/selinux/wiki
-# download https://raw.githubusercontent.com/fedora-selinux/scripts/master/selinux/make-fedora-selinux-patch.sh
-# run:
-# $ VERSION=2.7 ./make-fedora-selinux-patch.sh libselinux
-# HEAD https://github.com/fedora-selinux/selinux/commit/4247fad665261169b430895f0ab10f56eb33dd10
-Patch1: libselinux-fedora.patch
-BuildRequires: python2 python2-devel ruby-devel ruby libsepol-static >= %{libsepolver} swig pcre2-devel xz-devel
-%if 0%{?with_python3}
-BuildRequires: python3 python3-devel
-%endif # if with_python3
+Patch1: ln_old_coreutils.patch
+BuildRequires: libsepol-static >= %{libsepolver} swig pcre2-devel xz-devel python3 python3-devel
 BuildRequires: systemd
 Requires: libsepol%{?_isa} >= %{libsepolver} pcre2
-Conflicts: filesystem < 3, selinux-policy-base < 3.13.1-138
+#Conflicts: filesystem < 3, selinux-policy-base < 3.13.1-138
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -75,21 +63,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description utils
 The libselinux-utils package contains the utilities
 
-%package -n python2-libselinux
-%{?python_provide:%python_provide python2-libselinux}
-# Remove before F30
-Provides: %{name}-python = %{version}-%{release}
-Provides: %{name}-python%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-python < %{version}-%{release}
-Summary: SELinux python bindings for libselinux
-Group: Development/Libraries
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description -n python2-libselinux
-The libselinux-python package contains the python bindings for developing 
-SELinux applications. 
-
-%if 0%{?with_python3}
 %package -n python3-libselinux
 Summary: SELinux python 3 bindings for libselinux
 Group: Development/Libraries
@@ -102,17 +75,6 @@ Obsoletes: %{name}-python3 < %{version}-%{release}
 
 %description -n python3-libselinux
 The libselinux-python3 package contains python 3 bindings for developing
-SELinux applications. 
-%endif # with_python3
-
-%package ruby
-Summary: SELinux ruby bindings for libselinux
-Group: Development/Libraries
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Provides: ruby(selinux)
-
-%description ruby
-The libselinux-ruby package contains the ruby bindings for developing 
 SELinux applications. 
 
 %package devel
@@ -135,7 +97,8 @@ The libselinux-static package contains the static libraries
 needed for developing SELinux applications. 
 
 %prep
-%autosetup -p 1 -n libselinux-%{version}
+%setup -q -n selinux-userland-%{version}/upstream
+%patch1
 
 %build
 export LDFLAGS="%{?__global_ldflags}"
@@ -159,12 +122,9 @@ make clean
 make LIBDIR="%{_libdir}" CFLAGS="-g %{optflags}" %{?_smp_mflags} swigify
 make LIBDIR="%{_libdir}" CFLAGS="-g %{optflags}" %{?_smp_mflags} all
 
-BuildPythonWrapper %{__python}
-%if 0%{?with_python3}
 BuildPythonWrapper %{__python3}
-%endif # with_python3
 
-make RUBYINC="%{ruby_inc}" SHLIBDIR="%{_libdir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" CFLAGS="-g %{optflags}" %{?_smp_mflags} rubywrap
+make SHLIBDIR="%{_libdir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" CFLAGS="-g %{optflags}" %{?_smp_mflags}
 
 %install
 InstallPythonWrapper() {
@@ -193,12 +153,9 @@ mkdir -p %{buildroot}%{_sbindir}
 install -d -m 0755 %{buildroot}%{_rundir}/setrans
 echo "d %{_rundir}/setrans 0755 root root" > %{buildroot}%{_tmpfilesdir}/libselinux.conf
 
-InstallPythonWrapper %{__python}
-%if 0%{?with_python3}
 InstallPythonWrapper %{__python3}
-%endif # with_python3
 
-make DESTDIR="%{buildroot}" LIBDIR="%{buildroot}%{_libdir}" SHLIBDIR="%{buildroot}%{_libdir}" BINDIR="%{buildroot}%{_bindir}" SBINDIR="%{buildroot}%{_sbindir}" RUBYINSTALL=%{buildroot}%{ruby_vendorarchdir} install install-rubywrap
+make DESTDIR="%{buildroot}" LIBDIR="%{buildroot}%{_libdir}" SHLIBDIR="%{buildroot}%{_libdir}" BINDIR="%{buildroot}%{_bindir}" SBINDIR="%{buildroot}%{_sbindir}" install
 
 # Nuke the files we don't want to distribute
 rm -f %{buildroot}%{_sbindir}/compute_*
@@ -258,18 +215,9 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %files static
 %{_libdir}/libselinux.a
 
-%files -n python2-libselinux
-%{python2_sitearch}/selinux/
-%{python2_sitearch}/_selinux.so
-
-%if 0%{?with_python3}
 %files -n python3-libselinux
 %{python3_sitearch}/selinux/
 %{python3_sitearch}/_selinux.*.so
-%endif with_python3
-
-%files ruby
-%{ruby_vendorarchdir}/selinux.so
 
 %changelog
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.7-11
