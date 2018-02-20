@@ -35,7 +35,7 @@ Release: 11%{?dist}
 License: Public Domain
 Group: System Environment/Libraries
 # https://github.com/SELinuxProject/selinux/wiki/Releases
-Source: selinux-userland-%{version}/upstream
+Source: %{name}-%{version}.tar.bz2
 #Source1: selinuxconlist.8
 #Source2: selinuxdefcon.8
 Url: https://github.com/SELinuxProject/selinux/wiki
@@ -102,7 +102,7 @@ The libselinux-static package contains the static libraries
 needed for developing SELinux applications. 
 
 %prep
-%setup -q -n selinux-userland-%{version}/upstream
+%setup -q -n %{name}-%{version}/upstream
 %patch1
 
 %build
