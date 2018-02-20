@@ -40,7 +40,7 @@ Source: %{name}-%{version}.tar.bz2
 #Source2: selinuxdefcon.8
 Url: https://github.com/SELinuxProject/selinux/wiki
 Patch1: ln_old_coreutils.patch
-BuildRequires: libsepol-static >= %{libsepolver} swig xz-devel python3-base python3-devel
+BuildRequires: libsepol-static >= %{libsepolver} swig xz-devel python3-base python3-devel pcre-devel
 BuildRequires: systemd
 Requires: libsepol%{?_isa} >= %{libsepolver}
 #Conflicts: filesystem < 3, selinux-policy-base < 3.13.1-138
