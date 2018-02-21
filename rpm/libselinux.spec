@@ -21,7 +21,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %define libsepolver 2.7-1
-# our old rpm doesn't zet support the rundir macro
+# our old rpm doesn't yet support the rundir macro
 %if ! %{defined _rundir}
 %define _rundir %{_localstatedir}/run
 %endif
