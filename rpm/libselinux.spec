@@ -154,7 +154,7 @@ InstallPythonWrapper() {
     install-pywrap
 }
 
-# only install libsepol
+# only install libselinux
 cd %{name}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_tmpfilesdir}
