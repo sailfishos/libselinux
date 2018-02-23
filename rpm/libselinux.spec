@@ -43,7 +43,7 @@ Patch1: ln_old_coreutils.patch
 BuildRequires: libsepol-static >= %{libsepolver} swig xz-devel python3-base python3-devel pcre-devel
 BuildRequires: systemd
 # we don't build python2 modules, but make clean expects python2 (could be patched out though)
-BuildRequires: python
+BuildRequires: python python-devel
 Requires: libsepol%{?_isa} >= %{libsepolver}
 #Conflicts: filesystem < 3, selinux-policy-base < 3.13.1-138
 
