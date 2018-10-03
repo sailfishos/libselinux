@@ -1,0 +1,14 @@
+diff --git a/libselinux/src/Makefile b/libselinux/src/Makefile
+index 977b5c8..5da105b 100644
+--- a/libselinux/src/Makefile
++++ b/libselinux/src/Makefile
+@@ -190,7 +190,8 @@ install: all
+ 	install -m 755 $(LIBSO) $(DESTDIR)$(SHLIBDIR)
+ 	test -d $(DESTDIR)$(LIBDIR)/pkgconfig || install -m 755 -d $(DESTDIR)$(LIBDIR)/pkgconfig
+ 	install -m 644 $(LIBPC) $(DESTDIR)$(LIBDIR)/pkgconfig
+-	ln -sf --relative $(DESTDIR)$(SHLIBDIR)/$(LIBSO) $(DESTDIR)$(LIBDIR)/$(TARGET)
++	# Since --relative is not present in ln provided by our coreutils use lib.so directly in ln
++	ln -sf $(LIBSO) $(DESTDIR)$(LIBDIR)/$(TARGET)
+ 
+ install-pywrap: pywrap
+ 	test -d $(DESTDIR)$(PYTHONLIBDIR)/selinux || install -m 755 -d $(DESTDIR)$(PYTHONLIBDIR)/selinux

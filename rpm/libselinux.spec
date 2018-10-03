@@ -39,7 +39,7 @@ Source: %{name}-%{version}.tar.bz2
 #Source1: selinuxconlist.8
 #Source2: selinuxdefcon.8
 Url: https://github.com/SELinuxProject/selinux/wiki
-Patch1: ln_old_coreutils.patch
+Patch1: ln_old_coreutils_libselinux.patch
 BuildRequires: libsepol-static >= %{libsepolver} swig xz-devel python3-base python3-devel pcre-devel
 BuildRequires: systemd
 # we don't build python2 modules, but make clean expects python2 (could be patched out though)
@@ -105,7 +105,7 @@ needed for developing SELinux applications.
 
 %prep
 %setup -q -n %{name}-%{version}/upstream
-%patch1
+%patch1 -p1
 
 %build
 # only build libsepol
@@ -166,7 +166,7 @@ echo "d %{_rundir}/setrans 0755 root root" > %{buildroot}%{_tmpfilesdir}/libseli
 
 InstallPythonWrapper %{__python3}
 
-make DESTDIR="%{buildroot}" LIBDIR="%{buildroot}%{_libdir}" SHLIBDIR="%{buildroot}%{_libdir}" BINDIR="%{buildroot}%{_bindir}" SBINDIR="%{buildroot}%{_sbindir}" install
+make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" install
 
 # Nuke the files we don't want to distribute
 rm -f %{buildroot}%{_sbindir}/compute_*
