@@ -20,7 +20,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-%define libsepolver 2.7-1
+%define libsepolver 2.8-1
 # our old rpm doesn't yet support the rundir macro
 %if ! %{defined _rundir}
 %define _rundir %{_localstatedir}/run
@@ -30,8 +30,8 @@
 
 Summary: SELinux library and simple utilities
 Name: libselinux
-Version: 2.7
-Release: 11%{?dist}
+Version: 2.8
+Release: 1%{?dist}
 License: Public Domain
 Group: System Environment/Libraries
 # https://github.com/SELinuxProject/selinux/wiki/Releases
