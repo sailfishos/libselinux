@@ -38,16 +38,18 @@ License: Public Domain
 Group: System Environment/Libraries
 # https://github.com/SELinuxProject/selinux/wiki/Releases
 Source: %{name}-%{version}.tar.bz2
-#Source1: selinuxconlist.8
-#Source2: selinuxdefcon.8
 Url: https://github.com/SELinuxProject/selinux/wiki
 Patch1: ln_old_coreutils_libselinux.patch
-BuildRequires: libsepol-static >= %{libsepolver} swig xz-devel python3-base python3-devel pcre-devel
+BuildRequires: libsepol-static >= %{libsepolver}
+BuildRequires: pcre-devel
+BuildRequires: python
+BuildRequires: python-devel
+BuildRequires: python3-base
+BuildRequires: python3-devel
 BuildRequires: systemd
-# we don't build python2 modules, but make clean expects python2 (could be patched out though)
-BuildRequires: python python-devel
+BuildRequires: swig
+BuildRequires: xz-devel
 Requires: libsepol%{?_isa} >= %{libsepolver}
-#Conflicts: filesystem < 3, selinux-policy-base < 3.13.1-138
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -188,8 +190,6 @@ rm -f %{buildroot}%{_sbindir}/selinux_check_securetty_context
 mv %{buildroot}%{_sbindir}/getdefaultcon %{buildroot}%{_sbindir}/selinuxdefcon
 mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
 install -d %{buildroot}%{_mandir}/man8/
-#install -m 644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
-#install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man8/
 rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 
 #%ldconfig_scriptlets
@@ -202,7 +202,6 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %doc %{name}/LICENSE
 %{_libdir}/libselinux.so.*
 %dir %{_rundir}/setrans/
-%{_sbindir}/sefcontext_compile
 %{_tmpfilesdir}/libselinux.conf
 
 %files utils
@@ -210,6 +209,7 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %{_sbindir}/getenforce
 %{_sbindir}/getsebool
 %{_sbindir}/matchpathcon
+%{_sbindir}/sefcontext_compile
 %{_sbindir}/selinuxconlist
 %{_sbindir}/selinuxdefcon
 %{_sbindir}/selinuxexeccon
