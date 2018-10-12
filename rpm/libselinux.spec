@@ -21,10 +21,6 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 %define libsepolver 2.8
-# our old rpm doesn't yet support the rundir macro
-%if ! %{defined _rundir}
-%define _rundir %{_localstatedir}/run
-%endif
 
 %if ! %{defined python3_sitearch}
 %define python3_sitearch /%{_libdir}/python3.?/site-packages
