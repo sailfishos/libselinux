@@ -45,7 +45,7 @@ BuildRequires: python3-devel
 BuildRequires: systemd
 BuildRequires: swig
 BuildRequires: xz-devel
-Requires: libsepol%{?_isa} >= %{libsepolver}
+Requires: libsepol >= %{libsepolver}
 
 %description
 Security-enhanced Linux is a feature of the Linux® kernel and a number
@@ -65,7 +65,7 @@ decisions.  Required for any applications that use the SELinux API.
 %package utils
 Summary: SELinux libselinux utilies
 Group: Development/Libraries
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description utils
 The libselinux-utils package contains the utilities
@@ -73,11 +73,11 @@ The libselinux-utils package contains the utilities
 %package -n python3-libselinux
 Summary: SELinux python 3 bindings for libselinux
 Group: Development/Libraries
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 %{?python_provide:%python_provide python3-libselinux}
 # Remove before F30
 Provides: %{name}-python3 = %{version}-%{release}
-Provides: %{name}-python3%{?_isa} = %{version}-%{release}
+Provides: %{name}-python3 = %{version}-%{release}
 Obsoletes: %{name}-python3 < %{version}-%{release}
 
 %description -n python3-libselinux
@@ -87,8 +87,8 @@ SELinux applications.
 %package devel
 Summary: Header files and libraries used to build SELinux
 Group: Development/Libraries
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: libsepol-devel%{?_isa} >= %{libsepolver}
+Requires: %{name} = %{version}-%{release}
+Requires: libsepol-devel >= %{libsepolver}
 
 %description devel
 The libselinux-devel package contains the libraries and header files
@@ -97,7 +97,7 @@ needed for developing SELinux applications.
 %package static
 Summary: Static libraries used to build SELinux
 Group: Development/Libraries
-Requires: %{name}-devel%{?_isa} = %{version}-%{release}
+Requires: %{name}-devel = %{version}-%{release}
 
 %description static
 The libselinux-static package contains the static libraries
