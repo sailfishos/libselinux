@@ -74,11 +74,8 @@ The libselinux-utils package contains the utilities
 Summary: SELinux python 3 bindings for libselinux
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
-%{?python_provide:%python_provide python3-libselinux}
-# Remove before F30
 Provides: %{name}-python3 = %{version}-%{release}
 Provides: %{name}-python3 = %{version}-%{release}
-Obsoletes: %{name}-python3 < %{version}-%{release}
 
 %description -n python3-libselinux
 The libselinux-python3 package contains python 3 bindings for developing
