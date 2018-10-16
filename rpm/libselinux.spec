@@ -145,7 +145,7 @@ InstallPythonWrapper() {
   make \
     PYTHON=$BinaryName \
     DESTDIR="%{buildroot}" LIBDIR="%{buildroot}%{_libdir}" \
-    SHLIBDIR="%{buildroot}/%{_lib}" BINDIR="%{buildroot}%{_bindir}" \
+    SHLIBDIR="%{buildroot}/%{_libdir}" BINDIR="%{buildroot}%{_bindir}" \
     SBINDIR="%{buildroot}%{_sbindir}" \
     LIBSEPOLA="%{_libdir}/libsepol.a" \
     install-pywrap
@@ -213,14 +213,14 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %{_sbindir}/selabel_lookup_best_match
 %{_sbindir}/selabel_partial_match
 %{_sbindir}/selinux_check_access
-%{_mandir}/man5/*
-%{_mandir}/man8/*
 
 %files devel
 %{_libdir}/libselinux.so
 %{_libdir}/pkgconfig/libselinux.pc
 %{_includedir}/selinux/
 %{_mandir}/man3/*
+%{_mandir}/man5/*
+%{_mandir}/man8/*
 
 %files static
 %{_libdir}/libselinux.a
