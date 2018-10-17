@@ -70,6 +70,14 @@ Requires: %{name} = %{version}-%{release}
 %description utils
 The libselinux-utils package contains the utilities
 
+%package utils-extra
+Summary: SELinux libselinux extra utilies
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description utils-extra
+The libselinux-utils-extra package contains the extra utilities
+
 %package -n python3-libselinux
 Summary: SELinux python 3 bindings for libselinux
 Group: Development/Libraries
@@ -165,25 +173,9 @@ InstallPythonWrapper %{__python3}
 
 make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" install
 
-# Nuke the files we don't want to distribute
-rm -f %{buildroot}%{_sbindir}/compute_*
-rm -f %{buildroot}%{_sbindir}/deftype
-rm -f %{buildroot}%{_sbindir}/execcon
-rm -f %{buildroot}%{_sbindir}/getenforcemode
-rm -f %{buildroot}%{_sbindir}/getfilecon
-rm -f %{buildroot}%{_sbindir}/getpidcon
-rm -f %{buildroot}%{_sbindir}/mkdircon
-rm -f %{buildroot}%{_sbindir}/policyvers
-rm -f %{buildroot}%{_sbindir}/setfilecon
-rm -f %{buildroot}%{_sbindir}/selinuxconfig
-rm -f %{buildroot}%{_sbindir}/selinuxdisable
-rm -f %{buildroot}%{_sbindir}/getseuser
-rm -f %{buildroot}%{_sbindir}/togglesebool
-rm -f %{buildroot}%{_sbindir}/selinux_check_securetty_context
 mv %{buildroot}%{_sbindir}/getdefaultcon %{buildroot}%{_sbindir}/selinuxdefcon
 mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
 install -d %{buildroot}%{_mandir}/man8/
-rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 
 #%ldconfig_scriptlets
 %post
@@ -192,12 +184,14 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %postun -p /sbin/ldconfig
 
 %files
+%defattr(-,root,root,-)
 %doc %{name}/LICENSE
 %{_libdir}/libselinux.so.*
 %dir %{_rundir}/setrans/
 %{_tmpfilesdir}/libselinux.conf
 
 %files utils
+%defattr(-,root,root,-)
 %{_sbindir}/avcstat
 %{_sbindir}/getenforce
 %{_sbindir}/getsebool
@@ -214,7 +208,19 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %{_sbindir}/selabel_partial_match
 %{_sbindir}/selinux_check_access
 
+%files utils-extra
+%defattr(-,root,root,-)
+%{_sbindir}/compute_*
+%{_sbindir}/getfilecon
+%{_sbindir}/getpidcon
+%{_sbindir}/policyvers
+%{_sbindir}/setfilecon
+%{_sbindir}/getseuser
+%{_sbindir}/togglesebool
+%{_sbindir}/selinux_check_securetty_context
+
 %files devel
+%defattr(-,root,root,-)
 %{_libdir}/libselinux.so
 %{_libdir}/pkgconfig/libselinux.pc
 %{_includedir}/selinux/
@@ -223,8 +229,10 @@ rm -f %{buildroot}%{_mandir}/man8/togglesebool*
 %{_mandir}/man8/*
 
 %files static
+%defattr(-,root,root,-)
 %{_libdir}/libselinux.a
 
 %files -n python3-libselinux
+%defattr(-,root,root,-)
 %{python3_sitearch}/selinux/
 %{python3_sitearch}/_selinux.*.so
