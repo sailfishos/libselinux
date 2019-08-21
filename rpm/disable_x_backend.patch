@@ -1,0 +1,15 @@
+diff --git a/libselinux/src/Makefile b/libselinux/src/Makefile
+index 977b5c8c..8b8eedb8 100644
+--- a/libselinux/src/Makefile
++++ b/libselinux/src/Makefile
+@@ -128,6 +128,10 @@ SWIG = swig -Wall -python -o $(SWIGCOUT) -outdir ./ $(DISABLE_FLAGS)
+ 
+ SWIGRUBY = swig -Wall -ruby -o $(SWIGRUBYCOUT) -outdir ./ $(DISABLE_FLAGS)
+ 
++# Don't build X backend
++DISABLE_FLAGS+= -DNO_X_BACKEND
++SRCS:= $(filter-out label_x.c, $(SRCS))
++
+ all: $(LIBA) $(LIBSO) $(LIBPC)
+ 
+ pywrap: all $(SWIGFILES) $(AUDIT2WHYSO)

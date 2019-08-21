@@ -36,6 +36,8 @@ Group: System Environment/Libraries
 Source: %{name}-%{version}.tar.bz2
 Url: https://github.com/SELinuxProject/selinux/wiki
 Patch1: ln_old_coreutils_libselinux.patch
+Patch2: enable_android_backend.patch
+Patch3: disable_x_backend.patch
 BuildRequires: libsepol-static >= %{libsepolver}
 BuildRequires: pcre-devel
 BuildRequires: python
@@ -111,6 +113,8 @@ needed for developing SELinux applications.
 %prep
 %setup -q -n %{name}-%{version}/upstream
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 # only build libsepol
