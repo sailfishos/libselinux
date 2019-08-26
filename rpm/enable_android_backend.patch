@@ -1,0 +1,22 @@
+diff --git a/libselinux/src/Makefile b/libselinux/src/Makefile
+index 977b5c8c..d5c2e7c1 100644
+--- a/libselinux/src/Makefile
++++ b/libselinux/src/Makefile
+@@ -113,17 +113,6 @@ ifneq (,$(filter i386,$(ARCH)))
+ TLSFLAGS += -mno-tls-direct-seg-refs
+ endif
+ 
+-ifeq ($(ANDROID_HOST),y)
+-DISABLE_FLAGS+= -DNO_MEDIA_BACKEND -DNO_DB_BACKEND -DNO_X_BACKEND \
+-	-DBUILD_HOST
+-SRCS= callbacks.c freecon.c label.c label_file.c \
+-	label_backends_android.c regex.c label_support.c \
+-	matchpathcon.c setrans_client.c sha1.c booleans.c
+-else
+-DISABLE_FLAGS+= -DNO_ANDROID_BACKEND
+-SRCS:= $(filter-out label_backends_android.c, $(SRCS))
+-endif
+-
+ SWIG = swig -Wall -python -o $(SWIGCOUT) -outdir ./ $(DISABLE_FLAGS)
+ 
+ SWIGRUBY = swig -Wall -ruby -o $(SWIGRUBYCOUT) -outdir ./ $(DISABLE_FLAGS)
