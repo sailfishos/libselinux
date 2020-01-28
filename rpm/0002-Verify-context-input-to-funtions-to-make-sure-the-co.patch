@@ -1,0 +1,213 @@
+From b4ebb4534129a5d0f2e8a762015d089a0142b15f Mon Sep 17 00:00:00 2001
+From: Dan Walsh <dwalsh@redhat.com>
+Date: Mon, 23 Dec 2013 09:50:54 -0500
+Subject: [PATCH] Verify context input to funtions to make sure the context
+ field is not null.
+ 
+Return errno EINVAL, to prevent segfault.
+ 
+Rejected by upstream https://marc.info/?l=selinux&m=145036088424584&w=2
+ 
+FIXME: use __attribute__(nonnull (arg-index, ...))
+---
+ libselinux/src/avc_sidtab.c           | 5 +++++
+ libselinux/src/canonicalize_context.c | 5 +++++
+ libselinux/src/check_context.c        | 5 +++++
+ libselinux/src/compute_av.c           | 5 +++++
+ libselinux/src/compute_create.c       | 5 +++++
+ libselinux/src/compute_member.c       | 5 +++++
+ libselinux/src/compute_relabel.c      | 5 +++++
+ libselinux/src/compute_user.c         | 5 +++++
+ libselinux/src/fsetfilecon.c          | 8 ++++++--
+ libselinux/src/lsetfilecon.c          | 9 +++++++--
+ libselinux/src/setfilecon.c           | 8 ++++++--
+ 11 files changed, 59 insertions(+), 6 deletions(-)
+ 
+diff --git a/libselinux/src/avc_sidtab.c b/libselinux/src/avc_sidtab.c
+index 9669264d651a..c77543050b5e 100644
+--- a/libselinux/src/avc_sidtab.c
++++ b/libselinux/src/avc_sidtab.c
+@@ -81,6 +81,11 @@ sidtab_context_to_sid(struct sidtab *s,
+ 	int hvalue, rc = 0;
+ 	struct sidtab_node *cur;
+ 
++	if (! ctx) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	*sid = NULL;
+ 	hvalue = sidtab_hash(ctx);
+ 
+diff --git a/libselinux/src/canonicalize_context.c b/libselinux/src/canonicalize_context.c
+index ba4c9a2c7d46..c81587254b80 100644
+--- a/libselinux/src/canonicalize_context.c
++++ b/libselinux/src/canonicalize_context.c
+@@ -17,6 +17,11 @@ int security_canonicalize_context_raw(const char * con,
+ 	size_t size;
+ 	int fd, ret;
+ 
++	if (! con) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	if (!selinux_mnt) {
+ 		errno = ENOENT;
+ 		return -1;
+diff --git a/libselinux/src/check_context.c b/libselinux/src/check_context.c
+index 8a7997f03598..5be8434849af 100644
+--- a/libselinux/src/check_context.c
++++ b/libselinux/src/check_context.c
+@@ -14,6 +14,11 @@ int security_check_context_raw(const char * con)
+ 	char path[PATH_MAX];
+ 	int fd, ret;
+ 
++	if (! con) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	if (!selinux_mnt) {
+ 		errno = ENOENT;
+ 		return -1;
+diff --git a/libselinux/src/compute_av.c b/libselinux/src/compute_av.c
+index a47cffe98662..6d285a2e71c3 100644
+--- a/libselinux/src/compute_av.c
++++ b/libselinux/src/compute_av.c
+@@ -27,6 +27,11 @@ int security_compute_av_flags_raw(const char * scon,
+ 		return -1;
+ 	}
+ 
++	if ((! scon) || (! tcon)) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	snprintf(path, sizeof path, "%s/access", selinux_mnt);
+ 	fd = open(path, O_RDWR | O_CLOEXEC);
+ 	if (fd < 0)
+diff --git a/libselinux/src/compute_create.c b/libselinux/src/compute_create.c
+index 0975aeac2224..3e6a48c16968 100644
+--- a/libselinux/src/compute_create.c
++++ b/libselinux/src/compute_create.c
+@@ -64,6 +64,11 @@ int security_compute_create_name_raw(const char * scon,
+ 		return -1;
+ 	}
+ 
++	if ((! scon) || (! tcon)) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	snprintf(path, sizeof path, "%s/create", selinux_mnt);
+ 	fd = open(path, O_RDWR | O_CLOEXEC);
+ 	if (fd < 0)
+diff --git a/libselinux/src/compute_member.c b/libselinux/src/compute_member.c
+index 4e2d221ef9ea..d1dd9772c951 100644
+--- a/libselinux/src/compute_member.c
++++ b/libselinux/src/compute_member.c
+@@ -25,6 +25,11 @@ int security_compute_member_raw(const char * scon,
+ 		return -1;
+ 	}
+ 
++	if ((! scon) || (! tcon)) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	snprintf(path, sizeof path, "%s/member", selinux_mnt);
+ 	fd = open(path, O_RDWR | O_CLOEXEC);
+ 	if (fd < 0)
+diff --git a/libselinux/src/compute_relabel.c b/libselinux/src/compute_relabel.c
+index 49f77ef3344c..c3db7c0ada4c 100644
+--- a/libselinux/src/compute_relabel.c
++++ b/libselinux/src/compute_relabel.c
+@@ -25,6 +25,11 @@ int security_compute_relabel_raw(const char * scon,
+ 		return -1;
+ 	}
+ 
++	if ((! scon) || (! tcon)) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	snprintf(path, sizeof path, "%s/relabel", selinux_mnt);
+ 	fd = open(path, O_RDWR | O_CLOEXEC);
+ 	if (fd < 0)
+diff --git a/libselinux/src/compute_user.c b/libselinux/src/compute_user.c
+index 7b8812155750..401fd107e363 100644
+--- a/libselinux/src/compute_user.c
++++ b/libselinux/src/compute_user.c
+@@ -24,6 +24,11 @@ int security_compute_user_raw(const char * scon,
+ 		return -1;
+ 	}
+ 
++	if (! scon) {
++		errno=EINVAL;
++		return -1;
++	}
++
+ 	snprintf(path, sizeof path, "%s/user", selinux_mnt);
+ 	fd = open(path, O_RDWR | O_CLOEXEC);
+ 	if (fd < 0)
+diff --git a/libselinux/src/fsetfilecon.c b/libselinux/src/fsetfilecon.c
+index 52707d05ddd4..0cbe12d844d2 100644
+--- a/libselinux/src/fsetfilecon.c
++++ b/libselinux/src/fsetfilecon.c
+@@ -9,8 +9,12 @@
+ 
+ int fsetfilecon_raw(int fd, const char * context)
+ {
+-	int rc = fsetxattr(fd, XATTR_NAME_SELINUX, context, strlen(context) + 1,
+-			 0);
++	int rc;
++	if (! context) {
++		errno=EINVAL;
++		return -1;
++	}
++	rc = fsetxattr(fd, XATTR_NAME_SELINUX, context, strlen(context) + 1, 0);
+ 	if (rc < 0 && errno == ENOTSUP) {
+ 		char * ccontext = NULL;
+ 		int err = errno;
+diff --git a/libselinux/src/lsetfilecon.c b/libselinux/src/lsetfilecon.c
+index 1d3b28a1c5fc..ea6d70b7584d 100644
+--- a/libselinux/src/lsetfilecon.c
++++ b/libselinux/src/lsetfilecon.c
+@@ -9,8 +9,13 @@
+ 
+ int lsetfilecon_raw(const char *path, const char * context)
+ {
+-	int rc = lsetxattr(path, XATTR_NAME_SELINUX, context, strlen(context) + 1,
+-			 0);
++	int rc;
++	if (! context) {
++		errno=EINVAL;
++		return -1;
++	}
++
++	rc = lsetxattr(path, XATTR_NAME_SELINUX, context, strlen(context) + 1, 0);
+ 	if (rc < 0 && errno == ENOTSUP) {
+ 		char * ccontext = NULL;
+ 		int err = errno;
+diff --git a/libselinux/src/setfilecon.c b/libselinux/src/setfilecon.c
+index d05969c6c2f3..3f0200e8febc 100644
+--- a/libselinux/src/setfilecon.c
++++ b/libselinux/src/setfilecon.c
+@@ -9,8 +9,12 @@
+ 
+ int setfilecon_raw(const char *path, const char * context)
+ {
+-	int rc = setxattr(path, XATTR_NAME_SELINUX, context, strlen(context) + 1,
+-			0);
++	int rc;
++	if (! context) {
++		errno=EINVAL;
++		return -1;
++	}
++	rc = setxattr(path, XATTR_NAME_SELINUX, context, strlen(context) + 1, 0);
+ 	if (rc < 0 && errno == ENOTSUP) {
+ 		char * ccontext = NULL;
+ 		int err = errno;
+-- 
+2.23.0

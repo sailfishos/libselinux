@@ -1,8 +1,17 @@
+From eac53a8b28e1027fa5b0f6f2e9f6407bbbd94f5e Mon Sep 17 00:00:00 2001
+From: Lauri Kopo <lauri.kopo@jolla.com>
+Date: Tue, 28 Jan 2020 10:21:31 +0200
+Subject: [PATCH] enable_android_backend
+
+---
+ libselinux/src/Makefile | 11 -----------
+ 1 file changed, 11 deletions(-)
+
 diff --git a/libselinux/src/Makefile b/libselinux/src/Makefile
-index 977b5c8c..d5c2e7c1 100644
+index 7f5a5d74..d9978643 100644
 --- a/libselinux/src/Makefile
 +++ b/libselinux/src/Makefile
-@@ -113,17 +113,6 @@ ifneq (,$(filter i386,$(ARCH)))
+@@ -114,17 +114,6 @@ ifneq (,$(filter i386,$(ARCH)))
  TLSFLAGS += -mno-tls-direct-seg-refs
  endif
  
@@ -17,6 +26,9 @@ index 977b5c8c..d5c2e7c1 100644
 -SRCS:= $(filter-out label_backends_android.c, $(SRCS))
 -endif
 -
- SWIG = swig -Wall -python -o $(SWIGCOUT) -outdir ./ $(DISABLE_FLAGS)
- 
  SWIGRUBY = swig -Wall -ruby -o $(SWIGRUBYCOUT) -outdir ./ $(DISABLE_FLAGS)
+ 
+ all: $(LIBA) $(LIBSO) $(LIBPC)
+-- 
+2.24.1
+
