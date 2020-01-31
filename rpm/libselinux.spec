@@ -20,7 +20,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-%define libsepolver 2.8
+%define libsepolver 3.0
 
 %if ! %{defined python3_sitearch}
 %define python3_sitearch /%{_libdir}/python3.?/site-packages
@@ -28,20 +28,19 @@
 
 Summary: SELinux library and simple utilities
 Name: libselinux
-Version: 2.8
+Version: 3.0
 Release: 1
 License: Public Domain
-Group: System Environment/Libraries
 # https://github.com/SELinuxProject/selinux/wiki/Releases
 Source: %{name}-%{version}.tar.bz2
 Url: https://github.com/SELinuxProject/selinux/wiki
 Patch1: ln_old_coreutils_libselinux.patch
 Patch2: enable_android_backend.patch
 Patch3: disable_x_backend.patch
+Patch4: 0001-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
+Patch5: 0002-Verify-context-input-to-funtions-to-make-sure-the-co.patch
 BuildRequires: libsepol-static >= %{libsepolver}
 BuildRequires: pcre-devel
-BuildRequires: python
-BuildRequires: python-devel
 BuildRequires: python3-base
 BuildRequires: python3-devel
 BuildRequires: systemd
@@ -66,7 +65,6 @@ decisions.  Required for any applications that use the SELinux API.
 
 %package utils
 Summary: SELinux libselinux utilies
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 
 %description utils
@@ -74,7 +72,6 @@ The libselinux-utils package contains the utilities
 
 %package utils-extra
 Summary: SELinux libselinux extra utilies
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 
 %description utils-extra
@@ -82,7 +79,6 @@ The libselinux-utils-extra package contains the extra utilities
 
 %package -n python3-libselinux
 Summary: SELinux python 3 bindings for libselinux
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Provides: %{name}-python3 = %{version}-%{release}
 Provides: %{name}-python3 = %{version}-%{release}
@@ -93,7 +89,6 @@ SELinux applications.
 
 %package devel
 Summary: Header files and libraries used to build SELinux
-Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: libsepol-devel >= %{libsepolver}
 
@@ -103,7 +98,6 @@ needed for developing SELinux applications.
 
 %package static
 Summary: Static libraries used to build SELinux
-Group: Development/Libraries
 Requires: %{name}-devel = %{version}-%{release}
 
 %description static
@@ -111,10 +105,7 @@ The libselinux-static package contains the static libraries
 needed for developing SELinux applications. 
 
 %prep
-%setup -q -n %{name}-%{version}/upstream
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
 # only build libsepol
@@ -180,6 +171,7 @@ make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{
 mv %{buildroot}%{_sbindir}/getdefaultcon %{buildroot}%{_sbindir}/selinuxdefcon
 mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
 install -d %{buildroot}%{_mandir}/man8/
+rm -f %{buildroot}%{python3_sitearch}/selinux-*-py3.*.egg-info
 
 #%ldconfig_scriptlets
 %post
@@ -189,7 +181,7 @@ install -d %{buildroot}%{_mandir}/man8/
 
 %files
 %defattr(-,root,root,-)
-%doc %{name}/LICENSE
+%license %{name}/LICENSE
 %{_libdir}/libselinux.so.*
 %dir %{_rundir}/setrans/
 %{_tmpfilesdir}/libselinux.conf
@@ -211,6 +203,8 @@ install -d %{buildroot}%{_mandir}/man8/
 %{_sbindir}/selabel_lookup_best_match
 %{_sbindir}/selabel_partial_match
 %{_sbindir}/selinux_check_access
+%{_sbindir}/selabel_get_digests_all_partial_matches
+%{_sbindir}/validatetrans
 
 %files utils-extra
 %defattr(-,root,root,-)
@@ -231,6 +225,8 @@ install -d %{buildroot}%{_mandir}/man8/
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
+%{_mandir}/ru/man5/*
+%{_mandir}/ru/man8/*
 
 %files static
 %defattr(-,root,root,-)
