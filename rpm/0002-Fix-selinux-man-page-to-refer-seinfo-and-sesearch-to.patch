@@ -1,14 +1,14 @@
-From c36e12a0ed7641a9baa13afa1730b04eda0be07b Mon Sep 17 00:00:00 2001
+From 972932ef932089730564a57cec68e8ef8afe2cec Mon Sep 17 00:00:00 2001
 From: Miroslav Grepl <mgrepl@redhat.com>
 Date: Wed, 16 Jul 2014 08:28:03 +0200
 Subject: [PATCH] Fix selinux man page to refer seinfo and sesearch tools.
- 
+
 ---
  libselinux/man/man8/selinux.8 | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
- 
+
 diff --git a/libselinux/man/man8/selinux.8 b/libselinux/man/man8/selinux.8
-index e37aee6833b0..bf23b65579ca 100644
+index 31364271..8b4fc370 100644
 --- a/libselinux/man/man8/selinux.8
 +++ b/libselinux/man/man8/selinux.8
 @@ -91,11 +91,13 @@ This manual page was written by Dan Walsh <dwalsh@redhat.com>.
@@ -27,4 +27,5 @@ index e37aee6833b0..bf23b65579ca 100644
  Every confined service on the system has a man page in the following format:
  .br
 -- 
-2.23.0
+2.28.0
+

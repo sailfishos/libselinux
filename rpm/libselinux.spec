@@ -20,7 +20,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-%define libsepolver 3.0
+%define libsepolver 3.1
 
 %if ! %{defined python3_sitearch}
 %define python3_sitearch /%{_libdir}/python3.?/site-packages
@@ -28,17 +28,15 @@
 
 Summary: SELinux library and simple utilities
 Name: libselinux
-Version: 3.0
+Version: 3.1
 Release: 1
 License: Public Domain
+URL: https://github.com/SELinuxProject/selinux/wiki
 # https://github.com/SELinuxProject/selinux/wiki/Releases
 Source: %{name}-%{version}.tar.bz2
-Url: https://github.com/SELinuxProject/selinux/wiki
-Patch1: ln_old_coreutils_libselinux.patch
-Patch2: enable_android_backend.patch
-Patch3: disable_x_backend.patch
-Patch4: 0001-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
-Patch5: 0002-Verify-context-input-to-funtions-to-make-sure-the-co.patch
+Patch0001: 0001-libselinux-Add-build-option-to-disable-X11-backend.patch
+Patch0002: 0002-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
+Patch0003: 0003-libselinux-LABEL_BACKEND_ANDROID-add-option-to-enabl.patch
 BuildRequires: libsepol-static >= %{libsepolver}
 BuildRequires: pcre-devel
 BuildRequires: python3-base
@@ -104,13 +102,19 @@ Requires: %{name}-devel = %{version}-%{release}
 The libselinux-static package contains the static libraries
 needed for developing SELinux applications. 
 
+%global shared_make_flags LABEL_BACKEND_ANDROID=y \\\
+        DISABLE_X11\=y \\\
+        LIBDIR\="%{_libdir}" \\\
+        BINDIR\="%{_bindir}" \\\
+        SHLIBDIR\="%{_libdir}" \\\
+        SBINDIR\="%{_sbindir}"
+
 %prep
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
 # only build libsepol
 cd %{name}
-export LDFLAGS="%{?__global_ldflags}"
 export DISABLE_RPM="y"
 export USE_PCRE2="n"
 
@@ -121,19 +125,17 @@ BuildPythonWrapper() {
   BinaryName=$1
 
   # Perform the build from the upstream Makefile:
-  make \
-    PYTHON=$BinaryName \
-    LIBDIR="%{_libdir}" CFLAGS="-g %{optflags}" %{?_smp_mflags} \
-    pywrap
+  %make_build \
+      PYTHON=$BinaryName \
+      %{shared_make_flags} \
+      pywrap
 }
-
-make clean
-make LIBDIR="%{_libdir}" CFLAGS="-g %{optflags}" %{?_smp_mflags} swigify
-make LIBDIR="%{_libdir}" CFLAGS="-g %{optflags}" %{?_smp_mflags} all
-
+for target in swigify all ; do
+    %make_build $target \
+                %{shared_make_flags} \
+                CFLAGS="$CFLAGS -fno-semantic-interposition"
+done
 BuildPythonWrapper %{__python3}
-
-make SHLIBDIR="%{_libdir}" LIBDIR="%{_libdir}" LIBSEPOLA="%{_libdir}/libsepol.a" CFLAGS="-g %{optflags}" %{?_smp_mflags}
 
 %install
 InstallPythonWrapper() {
@@ -141,22 +143,12 @@ InstallPythonWrapper() {
 
   make \
     PYTHON=$BinaryName \
-    LIBDIR="%{_libdir}" CFLAGS="-g %{optflags}" %{?_smp_mflags} \
-    LIBSEPOLA="%{_libdir}/libsepol.a" \
-    pywrap
-
-  make \
-    PYTHON=$BinaryName \
-    DESTDIR="%{buildroot}" LIBDIR="%{buildroot}%{_libdir}" \
-    SHLIBDIR="%{buildroot}/%{_libdir}" BINDIR="%{buildroot}%{_bindir}" \
-    SBINDIR="%{buildroot}%{_sbindir}" \
+    DESTDIR="%{buildroot}" \
+    %{shared_make_flags} \
     LIBSEPOLA="%{_libdir}/libsepol.a" \
     install-pywrap
 }
-
-# only install libselinux
 cd %{name}
-rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_tmpfilesdir}
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_includedir}
@@ -166,12 +158,10 @@ echo "d %{_rundir}/setrans 0755 root root" > %{buildroot}%{_tmpfilesdir}/libseli
 
 InstallPythonWrapper %{__python3}
 
-make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{_bindir}" SBINDIR="%{_sbindir}" install
+%{__make} install DESTDIR=%{?buildroot} INSTALL="%{__install} -p" %{shared_make_flags}
 
 mv %{buildroot}%{_sbindir}/getdefaultcon %{buildroot}%{_sbindir}/selinuxdefcon
 mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
-install -d %{buildroot}%{_mandir}/man8/
-rm -f %{buildroot}%{python3_sitearch}/selinux-*-py3.*.egg-info
 
 #%ldconfig_scriptlets
 %post
@@ -235,4 +225,5 @@ rm -f %{buildroot}%{python3_sitearch}/selinux-*-py3.*.egg-info
 %files -n python3-libselinux
 %defattr(-,root,root,-)
 %{python3_sitearch}/selinux/
-%{python3_sitearch}/_selinux.*.so
+%{python3_sitearch}/selinux-*
+%{python3_sitearch}/_selinux*
