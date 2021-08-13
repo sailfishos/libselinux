@@ -41,7 +41,7 @@ BuildRequires: libsepol-static >= %{libsepolver}
 BuildRequires: pcre-devel
 BuildRequires: python3-base
 BuildRequires: python3-devel
-BuildRequires: systemd
+BuildRequires: pkgconfig(systemd)
 BuildRequires: swig
 BuildRequires: xz-devel
 Requires: libsepol >= %{libsepolver}
