@@ -38,12 +38,11 @@ Patch0001: 0001-libselinux-Add-build-option-to-disable-X11-backend.patch
 Patch0002: 0002-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
 Patch0003: 0003-libselinux-LABEL_BACKEND_ANDROID-add-option-to-enabl.patch
 BuildRequires: libsepol-static >= %{libsepolver}
-BuildRequires: pcre-devel
-BuildRequires: python3-base
-BuildRequires: python3-devel
+BuildRequires: pkgconfig(libpcre)
+BuildRequires: pkgconfig(python3)
 BuildRequires: pkgconfig(systemd)
+BuildRequires: pkgconfig(liblzma)
 BuildRequires: swig
-BuildRequires: xz-devel
 Requires: libsepol >= %{libsepolver}
 
 %description
