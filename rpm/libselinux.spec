@@ -20,29 +20,24 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-%define libsepolver 3.1
-
-%if ! %{defined python3_sitearch}
-%define python3_sitearch /%{_libdir}/python3.?/site-packages
-%endif
+%define libsepolver 3.7
 
 Summary: SELinux library and simple utilities
 Name: libselinux
-Version: 3.1
+Version: 3.7
 Release: 1
 License: Public Domain
 URL: https://github.com/SELinuxProject/selinux/wiki
 # https://github.com/SELinuxProject/selinux/wiki/Releases
 Source: %{name}-%{version}.tar.bz2
-Patch0001: 0001-libselinux-Add-build-option-to-disable-X11-backend.patch
-Patch0002: 0002-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
-Patch0003: 0003-libselinux-LABEL_BACKEND_ANDROID-add-option-to-enabl.patch
+Patch0001: 0001-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
 BuildRequires: libsepol-static >= %{libsepolver}
 BuildRequires: pkgconfig(libpcre)
 BuildRequires: pkgconfig(python3)
 BuildRequires: pkgconfig(systemd)
 BuildRequires: pkgconfig(liblzma)
 BuildRequires: swig
+BuildRequires: python3-pip
 Requires: libsepol >= %{libsepolver}
 
 %description
@@ -169,16 +164,16 @@ mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,-)
 %license %{name}/LICENSE
 %{_libdir}/libselinux.so.*
 %dir %{_rundir}/setrans/
 %{_tmpfilesdir}/libselinux.conf
 
 %files utils
-%defattr(-,root,root,-)
 %{_sbindir}/avcstat
 %{_sbindir}/getenforce
+%{_sbindir}/getpidprevcon
+%{_sbindir}/getpolicyload
 %{_sbindir}/getsebool
 %{_sbindir}/matchpathcon
 %{_sbindir}/sefcontext_compile
@@ -196,7 +191,6 @@ mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
 %{_sbindir}/validatetrans
 
 %files utils-extra
-%defattr(-,root,root,-)
 %{_sbindir}/compute_*
 %{_sbindir}/getfilecon
 %{_sbindir}/getpidcon
@@ -207,22 +201,17 @@ mv %{buildroot}%{_sbindir}/getconlist %{buildroot}%{_sbindir}/selinuxconlist
 %{_sbindir}/selinux_check_securetty_context
 
 %files devel
-%defattr(-,root,root,-)
 %{_libdir}/libselinux.so
 %{_libdir}/pkgconfig/libselinux.pc
 %{_includedir}/selinux/
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
-%{_mandir}/ru/man5/*
-%{_mandir}/ru/man8/*
 
 %files static
-%defattr(-,root,root,-)
 %{_libdir}/libselinux.a
 
 %files -n python3-libselinux
-%defattr(-,root,root,-)
 %{python3_sitearch}/selinux/
 %{python3_sitearch}/selinux-*
 %{python3_sitearch}/_selinux*
