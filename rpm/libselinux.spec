@@ -32,7 +32,7 @@ URL: https://github.com/SELinuxProject/selinux/wiki
 Source: %{name}-%{version}.tar.bz2
 Patch0001: 0001-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
 BuildRequires: libsepol-static >= %{libsepolver}
-BuildRequires: pkgconfig(libpcre)
+BuildRequires: pkgconfig(libpcre2-8)
 BuildRequires: pkgconfig(python3)
 BuildRequires: pkgconfig(systemd)
 BuildRequires: pkgconfig(liblzma)
@@ -110,7 +110,7 @@ needed for developing SELinux applications.
 # only build libsepol
 cd %{name}
 export DISABLE_RPM="y"
-export USE_PCRE2="n"
+export USE_PCRE2="y"
 
 # To support building the Python wrapper against multiple Python runtimes
 # Define a function, for how to perform a "build" of the python wrapper against
