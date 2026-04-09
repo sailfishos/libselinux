@@ -27,10 +27,11 @@ Name: libselinux
 Version: 3.7
 Release: 1
 License: Public Domain
-URL: https://github.com/SELinuxProject/selinux/wiki
+URL: https://github.com/sailfishos/libselinux
 # https://github.com/SELinuxProject/selinux/wiki/Releases
 Source: %{name}-%{version}.tar.bz2
 Patch0001: 0001-Fix-selinux-man-page-to-refer-seinfo-and-sesearch-to.patch
+Patch0002: 0002-libselinux-src-Makefile-build-python-module-without-.patch
 BuildRequires: libsepol-static >= %{libsepolver}
 BuildRequires: pkgconfig(libpcre2-8)
 BuildRequires: pkgconfig(python3)
